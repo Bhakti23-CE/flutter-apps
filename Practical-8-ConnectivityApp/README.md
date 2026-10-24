@@ -24,3 +24,14 @@ To develop a cross-platform application that detects network connectivity, displ
 
    ```bash
    cd ConnectivityApp
+
+2. Add App.js code
+3. Install dependencies:
+   ```bash
+   npm install
+
+4. Start the application:
+   ```bash
+   npx expo start
+
+6. Start the Android emulator and press a in the terminal.
