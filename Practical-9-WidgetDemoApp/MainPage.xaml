@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WidgetDemoApp.MainPage"
+             Title="Widget Demo App">
+
+    <!-- Step 1: ScrollView wraps an outer vertical stack -->
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+
+            <!-- Step 2: Circular profile picture placeholder -->
+            <Border StrokeShape="RoundRectangle 60"
+                    StrokeThickness="0"
+                    HeightRequest="120"
+                    WidthRequest="120"
+                    BackgroundColor="LightGray"
+                    HorizontalOptions="Center">
+                <Image Aspect="AspectFit"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Image.Source>
+                        <FontImageSource Glyph="&#x1F464;"
+                                         Size="70"
+                                         Color="DarkSlateGray" />
+                    </Image.Source>
+                </Image>
+            </Border>
+
+            <!-- Step 2: Profile summary card (Frame with rounded corners and shadow) -->
+            <Frame CornerRadius="15"
+                   HasShadow="True"
+                   Padding="15"
+                   BackgroundColor="White">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Bhakti Baraf"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="B.Tech Computer Engineering"
+                           FontSize="14"
+                           TextColor="Gray"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Steps 3 and 4: Horizontal row with Like and Message buttons -->
+            <HorizontalStackLayout HorizontalOptions="Center"
+                                   Spacing="15">
+                <Button x:Name="LikeButton"
+                        Text="Like (0)"
+                        Clicked="OnLikeClicked" />
+                <Button Text="Message"
+                        Clicked="OnMessageClicked" />
+            </HorizontalStackLayout>
+
+            <!-- Step 4: Entry with placeholder -->
+            <Entry Placeholder="Add a comment" />
+
+            <!-- Step 5: Horizontally scrolling CollectionView bound to Skills -->
+            <CollectionView ItemsSource="{Binding Skills}"
+                            HeightRequest="70">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"
+                                       ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="10"
+                               HasShadow="False"
+                               BorderColor="Blue"
+                               BackgroundColor="White"
+                               Padding="15,10"
+                               VerticalOptions="Center">
+                            <Label Text="{Binding .}"
+                                   FontSize="16"
+                                   TextColor="Black"
+                                   VerticalOptions="Center" />
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
