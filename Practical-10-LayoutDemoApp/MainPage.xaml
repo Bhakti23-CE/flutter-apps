@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LayoutsDemoApp.MainPage"
+             Title="Food Delivery"
+             BackgroundColor="#FFF8F3">
+
+    <!-- Shared styles so the repeated tag/stat elements stay short -->
+    <ContentPage.Resources>
+
+        <!-- Category tag chip (Frame) -->
+        <Style x:Key="TagFrame" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="#FFF0E8" />
+            <Setter Property="BorderColor" Value="#FFCCBC" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Margin" Value="0,0,10,10" />
+            <Setter Property="HasShadow" Value="False" />
+        </Style>
+        <Style x:Key="TagLabel" TargetType="Label">
+            <Setter Property="TextColor" Value="#BF360C" />
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+
+        <!-- Statistic number + caption -->
+        <Style x:Key="StatNumber" TargetType="Label">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="StatCaption" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#616161" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+    </ContentPage.Resources>
+
+    <!--  LAYOUT 1: ScrollView (outermost, EXACTLY ONE child)  -->
+    <ScrollView>
+
+        <!--  LAYOUT 2: outer vertical StackLayout = backbone of the page  -->
+        <StackLayout Orientation="Vertical" Padding="20,16,20,32" Spacing="18">
+
+            <!-- HEADER  -->
+            <!-- Grid row: left = title, right = notification icon. -->
+            <Grid ColumnDefinitions="*,Auto">
+
+                <!-- Left: horizontal StackLayout holding the logo emoji + title -->
+                <StackLayout Grid.Column="0"
+                             Orientation="Horizontal"
+                             Spacing="10"
+                             VerticalOptions="Center">
+                    <Label Text="🍔" FontSize="32" VerticalOptions="Center" />
+                    <StackLayout Orientation="Vertical" VerticalOptions="Center">
+                        <Label Text="Hungry today?" FontSize="13" TextColor="#757575" />
+                        <Label Text="FoodieExpress"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="#FF5722" />
+                    </StackLayout>
+                </StackLayout>
+
+                <!--  AbsoluteLayout - bell icon + overlapping badge  -->
+                <AbsoluteLayout Grid.Column="1"
+                                WidthRequest="50"
+                                HeightRequest="50"
+                                VerticalOptions="Center">
+
+                    <AbsoluteLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBellTapped" />
+                    </AbsoluteLayout.GestureRecognizers>
+
+                    <!-- Image: bell icon, bottom-left, 80% of the layout size -->
+                    <Image Source="notification_bell"
+                           Aspect="AspectFit"
+                           AbsoluteLayout.LayoutFlags="All"
+                           AbsoluteLayout.LayoutBounds="0,1,0.8,0.8" />
+
+                    <!-- BoxView: red circular badge, top-right corner, 40% of the layout size -->
+                    <BoxView Color="#E53935"
+                             CornerRadius="10"
+                             AbsoluteLayout.LayoutFlags="All"
+                             AbsoluteLayout.LayoutBounds="1,0,0.4,0.4" />
+
+                    <!-- Label: the badge number, same position and size as the badge -->
+                    <Label Text="3"
+                           TextColor="White"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           AbsoluteLayout.LayoutFlags="All"
+                           AbsoluteLayout.LayoutBounds="1,0,0.4,0.4" />
+                </AbsoluteLayout>
+
+            </Grid>
+
+            <!--  SEARCH (Entry inside a Frame)  -->
+            <Frame CornerRadius="16"
+                   Padding="12,0"
+                   HasShadow="False"
+                   BorderColor="#FFCCBC"
+                   BackgroundColor="White">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+
+                    <!-- Entry: single-line text input -->
+                    <Entry x:Name="SearchEntry"
+                           Grid.Column="0"
+                           Placeholder="Search pizza, burger, biryani..."
+                           PlaceholderColor="#9E9E9E"
+                           TextColor="#212121"
+                           ReturnType="Search"
+                           VerticalOptions="Center"
+                           Completed="OnSearchRequested" />
+
+                    <Button Grid.Column="1"
+                            Text="Search"
+                            BackgroundColor="#FF5722"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="40"
+                            Padding="16,0"
+                            VerticalOptions="Center"
+                            Clicked="OnSearchRequested" />
+                </Grid>
+            </Frame>
+
+            <!-- Status row: ActivityIndicator + status text -->
+            <StackLayout Orientation="Horizontal" Spacing="10">
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   Color="#FF5722"
+                                   WidthRequest="24"
+                                   HeightRequest="24"
+                                   VerticalOptions="Center" />
+                <Label x:Name="StatusLabel"
+                       Text="Ready to order"
+                       FontSize="14"
+                       TextColor="#757575"
+                       VerticalOptions="Center" />
+            </StackLayout>
+
+            <!-- ============ SECTION 3: CUSTOMER PROFILE CARD ============ -->
+            <Frame BackgroundColor="White"
+                   BorderColor="Transparent"
+                   CornerRadius="20"
+                   Padding="16"
+                   HasShadow="True">
+
+                <!-- Grid with 2 columns: fixed 80 | star (rest)  -->
+                <Grid ColumnDefinitions="80,*" ColumnSpacing="16">
+
+                    <!-- Column 0: circular profile photo (Image inside a round Frame) -->
+                    <Frame Grid.Column="0"
+                           WidthRequest="80"
+                           HeightRequest="80"
+                           CornerRadius="40"
+                           Padding="0"
+                           IsClippedToBounds="True"
+                           HasShadow="False"
+                           BorderColor="#FF5722"
+                           BackgroundColor="#FFF0E8"
+                           VerticalOptions="Center">
+                        <Image Source="dotnet_bot" Aspect="AspectFill" />
+                    </Frame>
+
+                    <!-- Column 1: vertical StackLayout NESTED inside a Grid cell -->
+                    <StackLayout Grid.Column="1"
+                                 Orientation="Vertical"
+                                 Spacing="4"
+                                 VerticalOptions="Center">
+                        <Label Text="Bhakti Baraf"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#212121" />
+                        <Label Text="⭐ Gold Member"
+                               FontSize="14"
+                               TextColor="#F57C00" />
+                        <Label Text="Deliver to: Home"
+                               FontSize="13"
+                               TextColor="#757575" />
+                    </StackLayout>
+
+                </Grid>
+            </Frame>
+
+            <!--  STATISTICS ROW  -->
+            <!-- Horizontal StackLayout with three small vertical StackLayouts (inside Frames).
+                 Equal WidthRequest + equal Spacing + Center = evenly spaced. -->
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="Center"
+                         Spacing="8">
+
+                <Frame WidthRequest="96" Padding="10" CornerRadius="16"
+                       HasShadow="False" BorderColor="Transparent"
+                       BackgroundColor="#FFE0B2">
+                    <StackLayout Orientation="Vertical" Spacing="2">
+                        <Label Text="24" Style="{StaticResource StatNumber}" TextColor="#E65100" />
+                        <Label Text="Orders" Style="{StaticResource StatCaption}" />
+                    </StackLayout>
+                </Frame>
+
+                <Frame WidthRequest="96" Padding="10" CornerRadius="16"
+                       HasShadow="False" BorderColor="Transparent"
+                       BackgroundColor="#F8BBD0">
+                    <StackLayout Orientation="Vertical" Spacing="2">
+                        <Label Text="12" Style="{StaticResource StatNumber}" TextColor="#C2185B" />
+                        <Label Text="Favourites" Style="{StaticResource StatCaption}" />
+                    </StackLayout>
+                </Frame>
+
+                <Frame WidthRequest="96" Padding="10" CornerRadius="16"
+                       HasShadow="False" BorderColor="Transparent"
+                       BackgroundColor="#C8E6C9">
+                    <StackLayout Orientation="Vertical" Spacing="2">
+                        <Label Text="850" Style="{StaticResource StatNumber}" TextColor="#2E7D32" />
+                        <Label Text="Rewards" Style="{StaticResource StatCaption}" />
+                    </StackLayout>
+                </Frame>
+
+            </StackLayout>
+
+            <!-- FOOD CATEGORY TAGS -->
+            <StackLayout Orientation="Vertical" Spacing="4">
+                <Label Text="What are you craving?"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#212121" />
+                <!-- BoxView used as a small accent underline -->
+                <BoxView Color="#FF5722"
+                         HeightRequest="3"
+                         WidthRequest="48"
+                         CornerRadius="2"
+                         HorizontalOptions="Start" />
+            </StackLayout>
+
+            <!-- FlexLayout with Wrap="Wrap": tags flow onto new lines ===== -->
+            <FlexLayout Direction="Row" Wrap="Wrap" JustifyContent="Start">
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Pizza" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Burger" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Chinese" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Indian" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Desserts" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Mexican" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Healthy" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Sushi" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+                <Frame Style="{StaticResource TagFrame}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCategoryTapped" />
+                    </Frame.GestureRecognizers>
+                    <Label Text="Drinks" Style="{StaticResource TagLabel}" />
+                </Frame>
+
+            </FlexLayout>
+
+            <!-- ============ SECTION 6: PROMO BANNER ============ -->
+            <Frame BackgroundColor="#FF7043"
+                   BorderColor="Transparent"
+                   CornerRadius="20"
+                   Padding="18"
+                   HasShadow="False">
+                <StackLayout Orientation="Vertical" Spacing="4">
+                    <Label Text="🎉 20% OFF your next order"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="White" />
+                    <Label Text="Use code FOOD20 at checkout"
+                           FontSize="13"
+                           TextColor="#FFF3E0" />
+                </StackLayout>
+            </Frame>
+
+            <!--  PROMINENT "ORDER NOW" BUTTON  -->
+            <Button x:Name="OrderNowButton"
+                    Text="Order Now"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    BackgroundColor="#FF5722"
+                    CornerRadius="28"
+                    HeightRequest="58"
+                    HorizontalOptions="Fill"
+                    Clicked="OnOrderNowClicked" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>
